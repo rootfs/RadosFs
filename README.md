@@ -1,4 +1,4 @@
-rados-hadoop
+RadosFs
 ============
 
-Ceph RADOS API for Hadoop
+Ceph RADOS File Store API
