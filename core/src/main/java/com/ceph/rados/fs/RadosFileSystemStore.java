@@ -35,7 +35,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
 import com.ceph.rados.fs.INode.FileType;
@@ -62,7 +61,7 @@ public class RadosFileSystemStore {
 
     private static final Log LOG = 
         LogFactory.getLog(RadosFileSystemStore.class.getName());
-  
+
     public void initialize(String conf, String id, String pool) throws IOException {    
         CONFIG_FILE =  conf == null ? "/etc/ceph/ceph.conf" : conf;
         ID = id == null ? "admin" : id;
@@ -122,7 +121,7 @@ public class RadosFileSystemStore {
                 }
             }
         } catch (Exception e) {
-            throw new IOException("get key failed");
+            throw new IOException("store inode failed");
         }
 
         return true;
@@ -169,13 +168,14 @@ public class RadosFileSystemStore {
         String key = pathToKey(path);
         try {
             RadosObjectInfo info = get(key);
+
             if (info == null && isRoot(key)) {
                 storeINode(path, INode.DIRECTORY_INODE);
                 return INode.DIRECTORY_INODE;
             }
             return INode.deserialize(new RadosInputStream(ioctx, info.getOid()));
         } catch (Exception e) {
-            throw new IOException("get key failed");
+            throw new IOException("get inode failed");
         }
     }
 

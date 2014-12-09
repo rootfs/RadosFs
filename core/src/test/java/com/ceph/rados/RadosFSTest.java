@@ -20,6 +20,7 @@
 package com.ceph.rados.fs;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -30,6 +31,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.apache.hadoop.fs.Path;
 
 public final class RadosFSTest {
 
@@ -62,6 +65,29 @@ public final class RadosFSTest {
     public void testGetVersion() throws IOException {
         String s = store.getVersion();
         System.out.println("version: " + s + " tested");
+    }
+
+    /**
+     * List paths
+     */
+    @Test
+    public void testListPath() throws IOException {
+        Set<Path> p = store.listSubPaths(new Path("/"));
+        String[] s = p.toArray(new String[0]);
+        System.out.println("size: " + s.length);
+        for (int i = 0; i < s.length; i++) {
+            System.out.println(i + ": " + s[i]);
+        }
+
+    }
+    /**
+     * Dump rados pool
+     */
+    @Test
+    public void testDump() throws IOException {
+        // ensure we have a valid pool
+        store.retrieveINode(new Path("/"));
+        store.dump();
     }
 
 
