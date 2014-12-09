@@ -47,6 +47,7 @@ public class RadosOutputStream extends OutputStream {
     }
 
     public RadosOutputStream(RadosFileSystemStore store, String id) {
+        ioctx = store.getIoCTX();
         oid = id;
         closed = false;
     }

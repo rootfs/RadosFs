@@ -58,15 +58,12 @@ public class RadosFileSystemStore {
     private static String POOL;
 
     private static Rados rados;
-    private static IoCTX ioctx;
-
-    private Configuration conf;
+    private static IoCTX ioctx = null;
 
     private static final Log LOG = 
         LogFactory.getLog(RadosFileSystemStore.class.getName());
   
-    public void initialize(URI uri, Configuration conf) throws IOException {    
-        this.conf = conf;
+    public void initialize(Configuration conf) throws IOException {    
         // read config
         String conf_file = conf.get("ceph_conf");
         String id = conf.get("ceph_id");
@@ -85,7 +82,19 @@ public class RadosFileSystemStore {
         }
     }
 
-    public RadosFileSystemStore() {
+    public void initialize(String conf, String id, String pool) throws IOException {    
+        CONFIG_FILE =  conf == null ? "/etc/ceph/ceph.conf" : conf;
+        ID = id == null ? "admin" : id;
+        POOL = pool == null ? "data" : pool;
+        // create rados and ioctx
+        rados = new Rados(ID);
+        try {
+            rados.confReadFile(new File(CONFIG_FILE));
+            rados.connect();
+            ioctx = rados.ioCtxCreate(POOL);
+        } catch (Exception e) {
+            throw new IOException("rados init failed");
+        }
     }
 
     public void tearDown() throws Exception {
@@ -95,7 +104,12 @@ public class RadosFileSystemStore {
     }
 
     public String getVersion() throws IOException {
-        return FILE_SYSTEM_VERSION_VALUE;
+        int[] version = rados.getVersion();
+        return Integer.toString(version[0]) + "." + Integer.toString(version[1]) + "." + Integer.toString(version[2]);
+    }
+
+    public IoCTX getIoCTX() {
+        return ioctx;
     }
 
     private void delete(String key) throws IOException {

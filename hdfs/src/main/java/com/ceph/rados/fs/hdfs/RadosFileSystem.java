@@ -89,7 +89,7 @@ public class RadosFileSystem extends FileSystem {
     if (store == null) {
       store = createDefaultStore(conf);
     }
-    store.initialize(uri, conf);
+    store.initialize(conf);
     setConf(conf);
     this.uri = URI.create(uri.getScheme() + "://" + uri.getAuthority());    
     this.workingDir =
