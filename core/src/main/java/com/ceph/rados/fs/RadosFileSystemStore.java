@@ -308,12 +308,12 @@ public class RadosFileSystemStore {
     }
 
     public void dump() throws IOException {
-        StringBuilder sb = new StringBuilder("Rados Filesystem, ");
+        StringBuilder sb = new StringBuilder("Rados Filesystem:\n");
         try {
             String[] objects = ioctx.listObjects();
             for (int i = 0; i < objects.length; i++) {
                 Path path = keyToPath(objects[i]);
-                sb.append(path).append("\n");
+                sb.append(path).append(":");
                 INode m = retrieveINode(path);
                 sb.append("\t").append(m.getFileType()).append("\n");
                 if (m.getFileType() == FileType.DIRECTORY) {

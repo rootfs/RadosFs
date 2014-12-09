@@ -61,8 +61,7 @@ public final class RadosFSTest {
      * This test verifies if we can get the version out of librados
      * It's currently hardcoded to expect at least 0.48.0
      */
-    @Test
-    public void testGetVersion() throws IOException {
+    private void GetVersion() throws IOException {
         String s = store.getVersion();
         System.out.println("version: " + s + " tested");
     }
@@ -70,25 +69,33 @@ public final class RadosFSTest {
     /**
      * List paths
      */
-    @Test
-    public void testListPath() throws IOException {
+    private void ListPath() throws IOException {
         Set<Path> p = store.listSubPaths(new Path("/"));
-        String[] s = p.toArray(new String[0]);
-        System.out.println("size: " + s.length);
+        Path[] s = p.toArray(new Path[0]);
         for (int i = 0; i < s.length; i++) {
-            System.out.println(i + ": " + s[i]);
+            System.out.println("Path " + i + ": " + s[i].toString());
         }
 
     }
     /**
      * Dump rados pool
      */
-    @Test
-    public void testDump() throws IOException {
+    private void Dump() throws IOException {
         // ensure we have a valid pool
         store.retrieveINode(new Path("/"));
         store.dump();
     }
 
+    private void Mkdirs() throws IOException {
+        store.storeINode(new Path("/test"), INode.DIRECTORY_INODE);
+    }
+
+    @Test
+    public void testAll() throws IOException {
+        GetVersion();
+        Mkdirs();
+        ListPath();
+        Dump();
+    }
 
 }
