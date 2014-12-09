@@ -87,16 +87,21 @@ public class RadosFileSystem extends FileSystem {
   public void initialize(URI uri, Configuration conf) throws IOException {
     super.initialize(uri, conf);
     if (store == null) {
-      store = createDefaultStore(conf);
+        String conf_file = conf.get("ceph_conf");
+        String id = conf.get("ceph_id");
+        String pool = conf.get("ceph_pool");
+
+        store = createDefaultStore();
+        store.initialize(conf_file, id, pool);
     }
-    store.initialize(conf);
+
     setConf(conf);
     this.uri = URI.create(uri.getScheme() + "://" + uri.getAuthority());    
     this.workingDir =
       new Path("/user", System.getProperty("user.name")).makeQualified(this);
   }  
 
-  private static RadosFileSystemStore createDefaultStore(Configuration conf) {
+  private static RadosFileSystemStore createDefaultStore() {
     return new RadosFileSystemStore();
   }
 

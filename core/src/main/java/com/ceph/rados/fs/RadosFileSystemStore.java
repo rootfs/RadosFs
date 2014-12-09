@@ -63,25 +63,6 @@ public class RadosFileSystemStore {
     private static final Log LOG = 
         LogFactory.getLog(RadosFileSystemStore.class.getName());
   
-    public void initialize(Configuration conf) throws IOException {    
-        // read config
-        String conf_file = conf.get("ceph_conf");
-        String id = conf.get("ceph_id");
-        String pool = conf.get("ceph_pool");
-        CONFIG_FILE =  conf_file == null ? "/etc/ceph/ceph.conf" : conf_file;
-        ID = id == null ? "admin" : id;
-        POOL = pool == null ? "data" : pool;
-        // create rados and ioctx
-        rados = new Rados(ID);
-        try {
-            rados.confReadFile(new File(CONFIG_FILE));
-            rados.connect();
-            ioctx = rados.ioCtxCreate(POOL);
-        } catch (Exception e) {
-            throw new IOException("rados init failed");
-        }
-    }
-
     public void initialize(String conf, String id, String pool) throws IOException {    
         CONFIG_FILE =  conf == null ? "/etc/ceph/ceph.conf" : conf;
         ID = id == null ? "admin" : id;
