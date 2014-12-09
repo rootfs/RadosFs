@@ -82,18 +82,18 @@ public final class RadosFSTest {
      */
     private void Dump() throws IOException {
         // ensure we have a valid pool
-        store.retrieveINode(new Path("/"));
         store.dump();
     }
 
-    private void Mkdirs() throws IOException {
-        store.storeINode(new Path("/test"), INode.DIRECTORY_INODE);
+    private void Mkdirs(String path) throws IOException {
+        store.storeINode(new Path(path), INode.DIRECTORY_INODE);
     }
 
     @Test
     public void testAll() throws IOException {
         GetVersion();
-        Mkdirs();
+        Mkdirs("/");
+        Mkdirs("/test");
         ListPath();
         Dump();
     }
