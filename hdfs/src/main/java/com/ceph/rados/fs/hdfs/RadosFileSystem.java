@@ -45,7 +45,7 @@ import com.ceph.rados.fs.RadosInputStream;
 import com.ceph.rados.fs.RadosOutputStream;
 import com.ceph.rados.fs.INode;
 import com.ceph.rados.fs.Block;
-import com.ceph.rados.fs.FileSystemStore;
+
 /**
  * <p>
  * A block-based {@link FileSystem} backed by Ceph Rados
@@ -55,7 +55,7 @@ public class RadosFileSystem extends FileSystem {
 
   private URI uri;
 
-  private FileSystemStore store;
+  private RadosFileSystemStore store;
 
   private Path workingDir;
 
@@ -63,7 +63,7 @@ public class RadosFileSystem extends FileSystem {
     // set store in initialize()
   }
   
-  public RadosFileSystem(FileSystemStore store) {
+  public RadosFileSystem(RadosFileSystemStore store) {
     this.store = store;
   }
 
@@ -96,7 +96,7 @@ public class RadosFileSystem extends FileSystem {
       new Path("/user", System.getProperty("user.name")).makeQualified(this);
   }  
 
-  private static FileSystemStore createDefaultStore(Configuration conf) {
+  private static RadosFileSystemStore createDefaultStore(Configuration conf) {
     return new RadosFileSystemStore();
   }
 

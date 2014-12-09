@@ -35,8 +35,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.classification.InterfaceAudience;
-import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
@@ -45,7 +43,10 @@ import com.ceph.rados.jna.RadosObjectInfo;
 import com.ceph.rados.IoCTX;
 import com.ceph.rados.Rados;
 
-public class RadosFileSystemStore implements FileSystemStore {
+/**
+ * A class of storing and retrieving {@link INode}s and {@link Block}s.
+ */
+public class RadosFileSystemStore {
     private static final String FILE_SYSTEM_VERSION_NAME = "fs-version";
     private static final String FILE_SYSTEM_VERSION_VALUE = "1";
 
@@ -64,7 +65,6 @@ public class RadosFileSystemStore implements FileSystemStore {
     private static final Log LOG = 
         LogFactory.getLog(RadosFileSystemStore.class.getName());
   
-    @Override
     public void initialize(URI uri, Configuration conf) throws IOException {    
         this.conf = conf;
         // read config
@@ -94,7 +94,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         rados.ioCtxDestroy(ioctx);
     }
 
-    @Override
     public String getVersion() throws IOException {
         return FILE_SYSTEM_VERSION_VALUE;
     }
@@ -107,17 +106,14 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
 
-    @Override
     public void deleteINode(Path path) throws IOException {
         delete(pathToKey(path));
     }
 
-    @Override
     public void deleteBlock(Block block) throws IOException {
         delete(blockToKey(block));
     }
 
-    @Override
     public boolean inodeExists(Path path) throws IOException {
         String key = pathToKey(path);
         try {
@@ -137,7 +133,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         return true;
     }
   
-    @Override
     public boolean blockExists(long blockId) throws IOException {
         try {
             RadosObjectInfo info = get(blockToKey(blockId));
@@ -175,7 +170,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
 
-    @Override
     public INode retrieveINode(Path path) throws IOException {
         String key = pathToKey(path);
         try {
@@ -190,7 +184,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
 
-    @Override
     public byte[] retrieveBlock(Block block, long byteRangeStart)
         throws IOException {
         RadosObjectInfo info = null;
@@ -221,7 +214,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
   
-    @Override
     public Set<Path> listSubPaths(Path path) throws IOException {
         String prefix = pathToKey(path);
         if (!prefix.endsWith(PATH_DELIMITER)) {
@@ -243,7 +235,6 @@ public class RadosFileSystemStore implements FileSystemStore {
 
     }
   
-    @Override
     public Set<Path> listDeepSubPaths(Path path) throws IOException {
         return listSubPaths(path);
     }
@@ -262,12 +253,11 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
 
-    @Override
+    
     public void storeINode(Path path, INode inode) throws IOException {
         put(pathToKey(path), inode.serialize(), inode.getSerializedLength());
     }
 
-    @Override
     public void storeBlock(Block block, File file) throws IOException {
         BufferedInputStream in = null;
         try {
@@ -311,7 +301,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         return key.isEmpty() || key.equals("/");
     }
 
-    @Override
     public void purge() throws IOException {
         try {
             String[] objects = ioctx.listObjects();
@@ -323,7 +312,6 @@ public class RadosFileSystemStore implements FileSystemStore {
         }
     }
 
-    @Override
     public void dump() throws IOException {
         StringBuilder sb = new StringBuilder("Rados Filesystem, ");
         try {

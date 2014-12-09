@@ -47,7 +47,7 @@ public class RadosInputStream extends InputStream {
         closed = false;
     }
 
-    public RadosInputStream(FileSystemStore store, String id) {
+    public RadosInputStream(RadosFileSystemStore store, String id) {
         oid = id;
         closed = false;
     }

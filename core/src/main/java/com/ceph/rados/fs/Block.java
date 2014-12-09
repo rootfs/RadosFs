@@ -19,7 +19,7 @@
 package com.ceph.rados.fs;
 
 /**
- * Holds metadata about a block of data being stored in a {@link FileSystemStore}.
+ * Holds metadata about a block of data being stored in a {@link RadosFileSystemStore}.
  */
 public class Block {
   private long id;
