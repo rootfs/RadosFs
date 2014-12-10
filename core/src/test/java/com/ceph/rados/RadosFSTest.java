@@ -69,8 +69,8 @@ public final class RadosFSTest {
     /**
      * List paths
      */
-    private void ListPath() throws IOException {
-        Set<Path> p = store.listSubPaths(new Path("/"));
+    private void ListPath(String root) throws IOException {
+        Set<Path> p = store.listSubPaths(new Path(root));
         Path[] s = p.toArray(new Path[0]);
         for (int i = 0; i < s.length; i++) {
             System.out.println("Path " + i + ": " + s[i].toString());
@@ -90,11 +90,26 @@ public final class RadosFSTest {
     }
 
     @Test
-    public void testAll() throws IOException {
+    public void testMkdirs() throws IOException {
         GetVersion();
         Mkdirs("/");
         Mkdirs("/test");
-        ListPath();
+        Mkdirs("/test/dir_test");
+        ListPath("/");
+        Dump();
+    }
+
+    @Test
+    public void testFileExists() throws IOException {
+        final String f = "/test/file_test/fileio";
+        Mkdirs("/");
+        Mkdirs("/test");
+        Mkdirs("/test/file_test");
+        if (store.inodeExists(new Path(f))) {
+            System.out.println("Inode " + f + " exists, delete first");
+            store.deleteINode(new Path(f));
+        }
+        ListPath("/");
         Dump();
     }
 
