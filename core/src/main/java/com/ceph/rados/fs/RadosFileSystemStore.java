@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
 
 import com.ceph.rados.fs.INode.FileType;
@@ -58,9 +56,6 @@ public class RadosFileSystemStore {
 
     private static Rados rados;
     private static IoCTX ioctx = null;
-
-    private static final Log LOG = 
-        LogFactory.getLog(RadosFileSystemStore.class.getName());
 
     public void initialize(String conf, String id, String pool) throws IOException {    
         CONFIG_FILE =  conf == null ? "/etc/ceph/ceph.conf" : conf;
