@@ -21,7 +21,9 @@ package com.ceph.rados.fs;
 
 import java.io.IOException;
 import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,6 +113,28 @@ public final class RadosFSTest {
             store.deleteINode(new Path(f));
         }
         INode inode = new INode(FileType.FILE, null);
+        store.storeINode(p, inode);
+        ListPath("/");
+        Dump();
+    }
+
+    @Test
+    public void testFileWrite() throws IOException, Exception {
+        final String f = "/test/file_test/fileio";
+        final File infile = new File("/etc/passwd");
+        Mkdirs("/");
+        Mkdirs("/test");
+        Mkdirs("/test/file_test");
+        Path p = new Path(f);
+        if (store.inodeExists(p)) {
+            System.out.println("Inode " + f + " exists, delete first");
+            store.deleteINode(new Path(f));
+        }
+        Block block = store.createAndStoreBlock(infile);
+        List<Block> blocks = new ArrayList<Block>();
+        blocks.add(block);
+        INode inode = new INode(FileType.FILE, 
+                                blocks.toArray(new Block[blocks.size()]));
         store.storeINode(p, inode);
         ListPath("/");
         Dump();

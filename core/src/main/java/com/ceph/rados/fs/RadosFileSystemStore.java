@@ -265,7 +265,7 @@ public class RadosFileSystemStore {
         while (blockExists(blockId)) {
             blockId = r.nextLong();
         }
-        Block block = new Block(blockId, 0);
+        Block block = new Block(blockId, file.length());
         storeBlock(block, file);
         return block;
     }
@@ -319,6 +319,9 @@ public class RadosFileSystemStore {
         try {
             String[] objects = ioctx.listObjects();
             for (int i = 0; i < objects.length; i++) {
+                if (objects[i].startsWith(BLOCK_PREFIX)) {
+                    continue;
+                }
                 Path path = keyToPath(objects[i]);
                 sb.append(path).append(":");
                 INode m = retrieveINode(path);
