@@ -190,7 +190,7 @@ public class RadosFileSystemStore {
             int bufferSize = in.available() - (int)byteRangeStart;
             byte[] buf = new byte[bufferSize];
             int numRead;
-            while ((numRead = in.read(buf)) >= 0) {
+            while ((numRead = in.read(buf)) > 0) {
                 out.write(buf, 0, numRead);
             }
             return buf;

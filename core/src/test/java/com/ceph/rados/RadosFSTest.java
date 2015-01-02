@@ -57,6 +57,12 @@ public final class RadosFSTest {
 
     @AfterClass
     public static void tearDown() throws Exception {
+        // clean up
+        Set<Path> p = store.listSubPaths(new Path("/"));
+        Path[] s = p.toArray(new Path[0]);
+        for (int i = 0; i < s.length; i++) {
+            store.deleteINode(s[i]);
+        }
         store.tearDown();
     }
 
@@ -80,6 +86,7 @@ public final class RadosFSTest {
         }
 
     }
+
     /**
      * Dump rados pool
      */
@@ -98,7 +105,6 @@ public final class RadosFSTest {
         Mkdirs("/");
         Mkdirs("/test");
         Mkdirs("/test/dir_test");
-        ListPath("/");
         Dump();
     }
 
@@ -115,7 +121,6 @@ public final class RadosFSTest {
         }
         INode inode = new INode(FileType.FILE, null);
         store.storeINode(p, inode);
-        ListPath("/");
         Dump();
     }
 
@@ -159,6 +164,47 @@ public final class RadosFSTest {
         INode inode = new INode(FileType.FILE, 
                                 blocks.toArray(new Block[blocks.size()]));
         store.storeINode(p, inode);
+        Dump();
+    }
+
+    @Test
+    public void testFileRead() throws IOException, Exception {
+        final String f = "/test/file_test/fileread";
+        final String data = "blah blah blalalah";
+        Mkdirs("/");
+        Mkdirs("/test");
+        Mkdirs("/test/file_test");
+        Path p = new Path(f);
+        if (store.inodeExists(p)) {
+            System.out.println("Inode " + f + " exists, delete first");
+            store.deleteINode(new Path(f));
+        }
+        ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes());
+        Block block = store.createAndStoreBlock(in);
+        List<Block> blocks = new ArrayList<Block>();
+        blocks.add(block);
+        INode inode = new INode(FileType.FILE, 
+                                blocks.toArray(new Block[blocks.size()]));
+        store.storeINode(p, inode);
+        String res = "";
+        int read = 0;
+        INode inode2 = store.retrieveINode(p);
+        for (int j = 0; j < inode2.getBlocks().length; j++) {
+            byte[] b = store.retrieveBlock(inode2.getBlocks()[j], 0);
+            if (read + b.length > data.length()){
+                System.out.println("Wrong size");
+            }else {
+                String s = new String(b);
+                res += s;
+                read += b.length;
+            }
+        }
+        System.out.println("result " + res);
+        if (res.equals(data)){
+            System.out.println("same");
+        }else{
+            System.out.println("different");
+        }
         Dump();
     }
 
