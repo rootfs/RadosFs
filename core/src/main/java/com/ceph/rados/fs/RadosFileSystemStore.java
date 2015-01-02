@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Random;
 
 import org.apache.hadoop.fs.Path;
 
@@ -256,6 +257,17 @@ public class RadosFileSystemStore {
         } finally {
             closeQuietly(in);
         }    
+    }
+
+    public synchronized Block createAndStoreBlock(File file) throws Exception {
+        Random r = new Random();
+        long blockId = r.nextLong();
+        while (blockExists(blockId)) {
+            blockId = r.nextLong();
+        }
+        Block block = new Block(blockId, 0);
+        storeBlock(block, file);
+        return block;
     }
 
     private void closeQuietly(Closeable closeable) {

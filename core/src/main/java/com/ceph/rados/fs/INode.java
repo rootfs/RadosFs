@@ -82,11 +82,15 @@ public class INode {
     try {
       out.writeByte(fileType.ordinal());
       if (isFile()) {
-        out.writeInt(blocks.length);
-        for (int i = 0; i < blocks.length; i++) {
-          out.writeLong(blocks[i].getId());
-          out.writeLong(blocks[i].getLength());
-        }
+          if (blocks != null){
+              out.writeInt(blocks.length);
+              for (int i = 0; i < blocks.length; i++) {
+                  out.writeLong(blocks[i].getId());
+                  out.writeLong(blocks[i].getLength());
+              }
+          }
+      }else{
+          out.writeInt(0);
       }
       out.close();
       out = null;

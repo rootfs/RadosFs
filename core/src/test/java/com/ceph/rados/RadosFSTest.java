@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.hadoop.fs.Path;
-
+import com.ceph.rados.fs.INode.FileType;
 public final class RadosFSTest {
 
     private static String ENV_CONFIG_FILE = System.getenv("RADOS_JAVA_CONFIG_FILE");
@@ -105,12 +105,16 @@ public final class RadosFSTest {
         Mkdirs("/");
         Mkdirs("/test");
         Mkdirs("/test/file_test");
-        if (store.inodeExists(new Path(f))) {
+        Path p = new Path(f);
+        if (store.inodeExists(p)) {
             System.out.println("Inode " + f + " exists, delete first");
             store.deleteINode(new Path(f));
         }
+        INode inode = new INode(FileType.FILE, null);
+        store.storeINode(p, inode);
         ListPath("/");
         Dump();
     }
+
 
 }
