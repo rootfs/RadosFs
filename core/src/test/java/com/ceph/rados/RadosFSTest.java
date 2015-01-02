@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
+import java.io.ByteArrayInputStream;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -119,8 +120,8 @@ public final class RadosFSTest {
     }
 
     @Test
-    public void testFileWrite() throws IOException, Exception {
-        final String f = "/test/file_test/fileio";
+    public void testFileCopy() throws IOException, Exception {
+        final String f = "/test/file_test/filecopy";
         final File infile = new File("/etc/passwd");
         Mkdirs("/");
         Mkdirs("/test");
@@ -136,7 +137,28 @@ public final class RadosFSTest {
         INode inode = new INode(FileType.FILE, 
                                 blocks.toArray(new Block[blocks.size()]));
         store.storeINode(p, inode);
-        ListPath("/");
+        Dump();
+    }
+
+    @Test
+    public void testFileWrite() throws IOException, Exception {
+        final String f = "/test/file_test/filewrite";
+        final String data = "blah blah blalalah";
+        Mkdirs("/");
+        Mkdirs("/test");
+        Mkdirs("/test/file_test");
+        Path p = new Path(f);
+        if (store.inodeExists(p)) {
+            System.out.println("Inode " + f + " exists, delete first");
+            store.deleteINode(new Path(f));
+        }
+        ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes());
+        Block block = store.createAndStoreBlock(in);
+        List<Block> blocks = new ArrayList<Block>();
+        blocks.add(block);
+        INode inode = new INode(FileType.FILE, 
+                                blocks.toArray(new Block[blocks.size()]));
+        store.storeINode(p, inode);
         Dump();
     }
 
