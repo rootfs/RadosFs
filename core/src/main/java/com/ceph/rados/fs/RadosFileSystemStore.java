@@ -249,11 +249,15 @@ public class RadosFileSystemStore {
         put(pathToKey(path), inode.serialize(), inode.getSerializedLength());
     }
 
+    public void storeBlock(Block block, InputStream in, long len) throws IOException {
+        put(blockToKey(block), in, len);
+    }
+
     public void storeBlock(Block block, File file) throws IOException {
         BufferedInputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(file));
-            put(blockToKey(block), in, block.getLength());
+            storeBlock(block, in, block.getLength());
         } finally {
             closeQuietly(in);
         }    
@@ -267,6 +271,17 @@ public class RadosFileSystemStore {
         }
         Block block = new Block(blockId, file.length());
         storeBlock(block, file);
+        return block;
+    }
+
+    public synchronized Block createAndStoreBlock(InputStream in) throws Exception {
+        Random r = new Random();
+        long blockId = r.nextLong();
+        while (blockExists(blockId)) {
+            blockId = r.nextLong();
+        }
+        Block block = new Block(blockId, in.available());
+        storeBlock(block, in, in.available());
         return block;
     }
 
@@ -330,7 +345,7 @@ public class RadosFileSystemStore {
                     continue;
                 }
                 for (int j = 0; j < m.getBlocks().length; j++) {
-                    sb.append("\t").append(m.getBlocks()[j]).append("\n");
+                    sb.append("\tBlockId: ").append(m.getBlocks()[j].getId()).append(" Length: ").append(m.getBlocks()[j].getLength()).append("\n");
                 }
             }
         } catch (Exception e) {

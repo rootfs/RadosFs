@@ -98,10 +98,12 @@ public class RadosInputStream extends InputStream {
             throw new IOException("Stream closed");
         }
         try {
-            int read = ioctx.read(oid, len, off, buf);
+            byte[] b = new byte[len];
+            int read = ioctx.read(oid, len, pos, b);
             if (read > 0) {
                 pos += read;
             }
+            System.arraycopy(b, 0, buf, off, read);
             return read;
         } catch (Exception e) {
             throw new IOException("read failed");
